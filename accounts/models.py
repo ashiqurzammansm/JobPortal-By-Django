@@ -9,6 +9,7 @@ class User(AbstractUser):
     )
     display_name = models.CharField(max_length=100)
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
+    profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
 
 
 class RecruiterProfile(models.Model):
@@ -35,9 +36,20 @@ class Job(models.Model):
     category = models.CharField(max_length=100)
     description = models.TextField()
     skills = models.TextField()
+    banner = models.ImageField(upload_to='job_banners/', blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
 
 class JobApplication(models.Model):
+    STATUS_CHOICES = (
+        ('Applied', 'Applied'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    )
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     jobseeker = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Applied')
     applied_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('job', 'jobseeker')

@@ -3,15 +3,22 @@
 
 <h2>Available Jobs</h2>
 
+<form method="get">
+    <input type="text" name="q" placeholder="Search job title">
+    <button type="submit">Search</button>
+</form>
+
 {% for job in jobs %}
 <div class="card">
+    {% if job.banner %}
+        <img src="{{ job.banner.url }}" style="width:100%;height:180px;object-fit:cover;">
+    {% endif %}
     <h3>{{ job.title }}</h3>
     <p>{{ job.description }}</p>
-    <p><b>Skills:</b> {{ job.skills }}</p>
-    <a href="/job/apply/{{ job.id }}/">Apply</a>
+    <a class="btn" href="/job/apply/{{ job.id }}/">Apply</a>
 </div>
 {% empty %}
-<p>No jobs available.</p>
+<p>No jobs found.</p>
 {% endfor %}
 
 {% endblock %}

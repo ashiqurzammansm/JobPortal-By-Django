@@ -1,20 +1,21 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model, authenticate, login, logout
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import RecruiterProfile, JobSeekerProfile, Job, JobApplication
+from django.contrib import messages
+from .models import Job, JobApplication, JobSeekerProfile, RecruiterProfile
 
-User = get_user_model()
 
 def register(request):
     if request.method == 'POST':
-        if request.POST.get('password') == request.POST.get('confirm_password'):
+        if request.POST['password'] == request.POST['confirm_password']:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
             User.objects.create_user(
-                username=request.POST.get('username'),
-                password=request.POST.get('password'),
-                email=request.POST.get('email'),
-                display_name=request.POST.get('display_name'),
-                user_type=request.POST.get('user_type')
+                username=request.POST['username'],
+                password=request.POST['password'],
+                email=request.POST['email'],
+                display_name=request.POST['display_name'],
+                user_type=request.POST['user_type']
             )
             return redirect('/login/')
     return render(request, 'register.html')
@@ -24,8 +25,8 @@ def login_view(request):
     if request.method == 'POST':
         user = authenticate(
             request,
-            username=request.POST.get('username'),
-            password=request.POST.get('password')
+            username=request.POST['username'],
+            password=request.POST['password']
         )
         if user:
             login(request, user)
@@ -38,95 +39,104 @@ def logout_view(request):
     return redirect('/login/')
 
 
-@login_required(login_url='/login/')
-def profile_redirect(request):
-    return redirect('/jobseeker/profile/' if request.user.user_type == 'jobseeker' else '/recruiter/profile/')
-
-
-@login_required(login_url='/login/')
-def jobseeker_profile(request):
-    if request.method == 'POST':
-        JobSeekerProfile.objects.update_or_create(
-            user=request.user,
-            defaults={
-                'full_name': request.POST.get('full_name'),
-                'skills': request.POST.get('skills'),
-                'experience_years': request.POST.get('experience_years'),
-                'job_type': request.POST.get('job_type'),
-                'preferred_location': request.POST.get('preferred_location'),
-                'expected_salary': request.POST.get('expected_salary'),
-                'resume': request.FILES.get('resume')
-            }
-        )
-        return redirect('/dashboard/')
-    return render(request, 'jobseeker_profile.html')
-
-
-@login_required(login_url='/login/')
-def recruiter_profile(request):
-    if request.method == 'POST':
-        RecruiterProfile.objects.update_or_create(
-            user=request.user,
-            defaults={
-                'company_name': request.POST.get('company_name'),
-                'company_description': request.POST.get('company_description')
-            }
-        )
-        return redirect('/dashboard/')
-    return render(request, 'recruiter_profile.html')
-
-
-@login_required(login_url='/login/')
-def post_job(request):
-    if request.method == 'POST':
-        Job.objects.create(
-            recruiter=request.user,
-            title=request.POST.get('title'),
-            openings=request.POST.get('openings'),
-            category=request.POST.get('category'),
-            description=request.POST.get('description'),
-            skills=request.POST.get('skills')
-        )
-        return redirect('/dashboard/')
-    return render(request, 'post_job.html')
-
-
-@login_required(login_url='/login/')
-def job_list(request):
-    return render(request, 'job_list.html', {'jobs': Job.objects.all()})
-
-
-@login_required(login_url='/login/')
-def apply_job(request, job_id):
-    JobApplication.objects.get_or_create(
-        job=Job.objects.get(id=job_id),
-        jobseeker=request.user
-    )
-    return redirect('/applied/jobs/')
-
-
-@login_required(login_url='/login/')
-def applied_jobs(request):
-    applications = JobApplication.objects.filter(jobseeker=request.user)
-    return render(request, 'applied_jobs.html', {'applications': applications})
-
-
-@login_required(login_url='/login/')
-def job_applicants(request, job_id):
-    job = Job.objects.get(id=job_id, recruiter=request.user)
-    applications = JobApplication.objects.filter(job=job)
-    return render(request, 'job_applicants.html', {'job': job, 'applications': applications})
-
-
-@login_required(login_url='/login/')
+@login_required
 def dashboard(request):
     if request.user.user_type == 'jobseeker':
-        try:
-            JobSeekerProfile.objects.get(user=request.user)
-        except:
-            return redirect('/profile/')
-        jobs = Job.objects.all()
-        return render(request, 'dashboard_jobseeker.html', {'jobs': jobs})
+        return render(request, 'dashboard_jobseeker.html')
 
     jobs = Job.objects.filter(recruiter=request.user)
     return render(request, 'dashboard_recruiter.html', {'jobs': jobs})
+
+
+
+@login_required
+def profile_redirect(request):
+    if request.user.user_type == 'jobseeker':
+        return redirect('/jobseeker/profile/')
+    return redirect('/recruiter/profile/')
+
+
+# ---------- JOBSEEKER PROFILE ----------
+@login_required
+def jobseeker_profile(request):
+    profile, _ = JobSeekerProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        if request.FILES.get('profile_image'):
+            request.user.profile_image = request.FILES.get('profile_image')
+            request.user.save()
+
+        profile.full_name = request.POST['full_name']
+        profile.skills = request.POST['skills']
+        profile.experience_years = request.POST['experience_years']
+        profile.job_type = request.POST['job_type']
+        profile.preferred_location = request.POST['preferred_location']
+        profile.expected_salary = request.POST['expected_salary']
+
+        if request.FILES.get('resume'):
+            profile.resume = request.FILES.get('resume')
+
+        profile.save()
+        return redirect('/dashboard/')
+
+    return render(request, 'jobseeker_profile.html', {'profile': profile})
+
+
+# ---------- RECRUITER PROFILE ----------
+@login_required
+def recruiter_profile(request):
+    profile, _ = RecruiterProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        profile.company_name = request.POST['company_name']
+        profile.company_description = request.POST['company_description']
+        profile.save()
+        return redirect('/dashboard/')
+
+    return render(request, 'recruiter_profile.html', {'profile': profile})
+
+
+@login_required
+def job_list(request):
+    query = request.GET.get('q')
+    jobs = Job.objects.all()
+    if query:
+        jobs = jobs.filter(title__icontains=query)
+    return render(request, 'job_list.html', {'jobs': jobs})
+
+
+@login_required
+def apply_job(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+    if JobApplication.objects.filter(job=job, jobseeker=request.user).exists():
+        return redirect('/applied/jobs/')
+    JobApplication.objects.create(job=job, jobseeker=request.user)
+    return redirect('/applied/jobs/')
+
+
+@login_required
+def applied_jobs(request):
+    apps = JobApplication.objects.filter(jobseeker=request.user)
+    return render(request, 'applied_jobs.html', {'applications': apps})
+
+
+@login_required
+def job_applicants(request, job_id):
+    job = get_object_or_404(Job, id=job_id, recruiter=request.user)
+    apps = JobApplication.objects.filter(job=job)
+    return render(request, 'job_applicants.html', {'applications': apps, 'job': job})
+
+
+@login_required
+def update_application_status(request, app_id, status):
+    app = get_object_or_404(JobApplication, id=app_id, job__recruiter=request.user)
+    app.status = status
+    app.save()
+    return redirect(f'/job/{app.job.id}/applicants/')
+
+
+@login_required
+def delete_job(request, job_id):
+    job = get_object_or_404(Job, id=job_id, recruiter=request.user)
+    job.delete()
+    return redirect('/dashboard/')

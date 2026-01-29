@@ -1,38 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Jobseeker Profile (Worldwide)</h2>
+<h2>My Profile</h2>
+
+<div class="card">
+
+{% if user.profile_image %}
+    <img src="{{ user.profile_image.url }}"
+         style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:15px;">
+{% endif %}
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+
+    <label>Profile Picture</label>
+    <input type="file" name="profile_image">
 
     <label>Full Name</label>
     <input type="text" name="full_name" required>
 
     <label>Skills</label>
-    <textarea name="skills" placeholder="Python, Django, Android, SQL" required></textarea>
+    <textarea name="skills" required></textarea>
 
     <label>Experience (Years)</label>
     <input type="number" name="experience_years" required>
 
     <label>Preferred Job Type</label>
-    <select name="job_type" required>
-        <option value="">Select</option>
-        <option value="Remote">Remote</option>
-        <option value="Onsite">Onsite</option>
-        <option value="Hybrid">Hybrid</option>
+    <select name="job_type">
+        <option>Remote</option>
+        <option>Onsite</option>
+        <option>Hybrid</option>
     </select>
 
     <label>Preferred Location</label>
-    <input type="text" name="preferred_location" placeholder="Worldwide / USA / Germany / Remote" required>
+    <input type="text" name="preferred_location" required>
 
     <label>Expected Salary</label>
-    <input type="text" name="expected_salary" placeholder="e.g. $2000 / Negotiable" required>
+    <input type="text" name="expected_salary" required>
 
-    <label>Upload Resume</label>
-    <input type="file" name="resume" required>
+    <label>Resume</label>
+    <input type="file" name="resume">
 
     <button type="submit">Save Profile</button>
 </form>
+
+</div>
 
 {% endblock %}
