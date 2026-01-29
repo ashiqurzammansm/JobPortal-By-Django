@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Jobseeker Profile (Worldwide)</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>Full Name</label>
+    <input type="text" name="full_name" required>
+
+    <label>Skills</label>
+    <textarea name="skills" placeholder="Python, Django, Android, SQL" required></textarea>
+
+    <label>Experience (Years)</label>
+    <input type="number" name="experience_years" required>
+
+    <label>Preferred Job Type</label>
+    <select name="job_type" required>
+        <option value="">Select</option>
+        <option value="Remote">Remote</option>
+        <option value="Onsite">Onsite</option>
+        <option value="Hybrid">Hybrid</option>
+    </select>
+
+    <label>Preferred Location</label>
+    <input type="text" name="preferred_location" placeholder="Worldwide / USA / Germany / Remote" required>
+
+    <label>Expected Salary</label>
+    <input type="text" name="expected_salary" placeholder="e.g. $2000 / Negotiable" required>
+
+    <label>Upload Resume</label>
+    <input type="file" name="resume" required>
+
+    <button type="submit">Save Profile</button>
+</form>
+
+{% endblock %}

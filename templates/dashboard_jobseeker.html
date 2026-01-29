@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Jobseeker Dashboard</h2>
+
+{% for job in jobs %}
+<div class="card">
+    <h3>{{ job.title }}</h3>
+    <p>{{ job.description }}</p>
+    <p><b>Skills:</b> {{ job.skills }}</p>
+    <a href="/job/apply/{{ job.id }}/">Apply</a>
+</div>
+{% empty %}
+<p>No matching jobs found.</p>
+{% endfor %}
+
+{% endblock %}

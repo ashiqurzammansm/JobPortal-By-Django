@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 style="text-align:center;">Login</h2>
+
+<div style="max-width:400px; margin:auto;">
+    <form method="post">
+        {% csrf_token %}
+
+        <label>Username</label>
+        <input type="text" name="username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <p style="text-align:center; margin-top:15px;">
+        Don’t have an account?
+        <a href="/register/">Register</a>
+    </p>
+</div>
+
+{% endblock %}

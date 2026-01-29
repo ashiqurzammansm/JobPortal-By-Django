@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Recruiter Dashboard</h2>
+
+<a href="/job/post/">
+    <button style="margin-bottom:15px;">Post New Job</button>
+</a>
+
+<h3>My Jobs</h3>
+
+{% for job in jobs %}
+<div class="card">
+    <h4>{{ job.title }}</h4>
+    <p>{{ job.description }}</p>
+    <a href="/job/{{ job.id }}/applicants/">View Applicants</a>
+</div>
+{% empty %}
+<p>You have not posted any jobs yet.</p>
+{% endfor %}
+
+{% endblock %}
