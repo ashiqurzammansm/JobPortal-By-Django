@@ -1,27 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Post a New Job</h2>
+<h2>Post New Job</h2>
 
-<form method="post">
+<div class="card">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    <label>Job Title</label>
-    <input type="text" name="title" placeholder="e.g. Android Developer" required>
+    <input type="text" name="title" placeholder="Job Title" required>
+    <input type="number" name="openings" placeholder="Openings" required>
+    <input type="text" name="category" placeholder="Category" required>
+    <textarea name="description" placeholder="Job Description" required></textarea>
+    <textarea name="skills" placeholder="Required Skills" required></textarea>
 
-    <label>Number of Openings</label>
-    <input type="number" name="openings" placeholder="e.g. 2" required>
-
-    <label>Category</label>
-    <input type="text" name="category" placeholder="e.g. Software Development" required>
-
-    <label>Job Description</label>
-    <textarea name="description" placeholder="Describe the job role" required></textarea>
-
-    <label>Required Skills</label>
-    <textarea name="skills" placeholder="e.g. Python, Django, SQL" required></textarea>
+    <label>Job Banner</label>
+    <input type="file" name="banner">
 
     <button type="submit">Post Job</button>
 </form>
+</div>
 
 {% endblock %}

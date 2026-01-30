@@ -1,21 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div style="text-align:center; padding:40px 10px;">
-    <h1>Welcome to Job Portal</h1>
-    <p>Find jobs or hire talent easily</p>
+<div class="card">
+    <h2>Welcome to Job Portal</h2>
+    <p>A simple platform where job seekers find jobs and recruiters hire talent.</p>
 
     {% if not user.is_authenticated %}
-        <a href="/login/">
-            <button style="width:200px; margin:10px;">Login</button>
-        </a>
-        <a href="/register/">
-            <button style="width:200px; background:green;">Register</button>
-        </a>
+        <p>Please login or register to continue.</p>
     {% else %}
-        <a href="/dashboard/">
-            <button style="width:200px;">Go to Dashboard</button>
-        </a>
+        <p>Go to your dashboard to continue.</p>
     {% endif %}
 </div>
 

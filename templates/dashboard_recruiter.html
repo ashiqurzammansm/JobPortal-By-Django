@@ -3,18 +3,20 @@
 
 <h2>My Jobs</h2>
 
+<a class="btn" href="/job/post/">Post New Job</a>
+<br><br>
+
 {% for job in jobs %}
 <div class="card">
     <h3>{{ job.title }}</h3>
     <p>{{ job.description }}</p>
 
-    <a class="btn" href="/job/{{ job.id }}/applicants/">View Applicants</a>
-    <a class="btn" style="background:#dc2626" href="/job/delete/{{ job.id }}/">
-        Delete Job
-    </a>
+    <a class="btn" href="/job/{{ job.id }}/applicants/">Applicants</a>
+    <a class="btn" href="/job/edit/{{ job.id }}/">Edit</a>
+    <a class="btn" style="background:#dc2626" href="/job/delete/{{ job.id }}/">Delete</a>
 </div>
 {% empty %}
-<p>You have not posted any jobs yet.</p>
+<p>No jobs posted yet.</p>
 {% endfor %}
 
 {% endblock %}

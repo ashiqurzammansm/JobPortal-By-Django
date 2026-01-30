@@ -31,39 +31,25 @@
             text-decoration: underline;
         }
 
-        nav img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
         .container {
-            max-width: 1100px;
+            max-width: 900px;
             margin: auto;
             padding: 20px;
         }
 
         .card {
             background: white;
-            padding: 16px;
+            padding: 20px;
             border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
-        .btn {
-            display: inline-block;
-            padding: 8px 14px;
+        button {
             background: #2563eb;
             color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            background: #1d4ed8;
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -72,23 +58,20 @@
 
 <nav>
     <div>
-        <a href="/dashboard/">Dashboard</a>
+        <a href="/">Home</a>
 
-        {% if user.is_authenticated and user.user_type == 'jobseeker' %}
-            <a href="/jobs/">Jobs</a>
-            <a href="/applied/jobs/">Applied Jobs</a>
+        {% if user.is_authenticated %}
+            <a href="/dashboard/">Dashboard</a>
+            <a href="/profile/">Profile</a>
+            <a href="/logout/">Logout</a>
+        {% else %}
+            <a href="/login/">Login</a>
+            <a href="/register/">Register</a>
         {% endif %}
-
-        {% if user.is_authenticated and user.user_type == 'recruiter' %}
-            <a href="/dashboard/">My Jobs</a>
-        {% endif %}
-
-        <a href="/profile/">Profile</a>
-        <a href="/logout/">Logout</a>
     </div>
 
     {% if user.is_authenticated and user.profile_image %}
-        <img src="{{ user.profile_image.url }}">
+        <img src="{{ user.profile_image.url }}" width="36" height="36" style="border-radius:50%;">
     {% endif %}
 </nav>
 
